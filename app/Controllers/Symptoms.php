@@ -10,7 +10,11 @@ class Symptoms extends BaseController
 {
     public function index()
     {
-        return view('pages/symptoms');
+        $data = [
+            'title' => 'Gejala'
+        ];
+
+        return view('pages/symptoms', $data);
     }
 
     public function getData()
@@ -24,10 +28,6 @@ class Symptoms extends BaseController
         $query = $symptomsModel;
 
         if (!empty($searchValue)) {
-            // $query = $query->like('name', $searchValue)
-            //     ->orLike('code', $searchValue)
-            //     ->orLike('description', $searchValue)
-            //     ->orLike('suggestion', $searchValue);
             $query = $query->like('description', $searchValue)
                 ->orLike('code', $searchValue);
         }
@@ -63,9 +63,7 @@ class Symptoms extends BaseController
 
             $dataInsert = [
                 'code'          => $dataPost['code'],
-                // 'name'          => $dataPost['name'],
-                'description'   => strip_tags($dataPost['description']),
-                // 'suggestion'    => $dataPost['suggestion'],
+                'description'   => strip_tags($dataPost['description'])
             ];
 
 
@@ -96,9 +94,7 @@ class Symptoms extends BaseController
 
             $dataEdit = [
                 'code'          => $dataPost['code'],
-                // 'name'          => $dataPost['name'],
-                'description'   => strip_tags($dataPost['description']),
-                // 'suggestion'    => $dataPost['suggestion']
+                'description'   => strip_tags($dataPost['description'])
             ];
 
             if ($symptomsModel->update($dataPost['id'], $dataEdit)) {
@@ -157,5 +153,21 @@ class Symptoms extends BaseController
             }
         }
     }
-}
 
+    public function getSymptoms()
+    {
+        $symptomModel = new ModelsSymptoms();
+
+        $symptoms = $symptomModel->findAll();
+
+        $data = [];
+        foreach ($symptoms as $symptom) {
+            $data[] = [
+                'id' => $symptom['id'],
+                'text' => $symptom['description']
+            ];
+        }
+
+        return $this->response->setJSON($data);
+    }
+}
